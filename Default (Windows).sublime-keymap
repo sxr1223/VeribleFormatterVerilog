@@ -1,0 +1,6 @@
+[
+    {
+        "keys": ["f11"],
+        "command": "verible_formatter_sublime"
+    }
+]
