@@ -51,12 +51,16 @@ class verible_formatter_sublime_command(sublime_plugin.TextCommand):
 
             command.append(file_path)
 
-            print(command)
+            # print(command)
             try:
                 # 执行命令
-                subprocess.run(command, check=True)
-                sublime.message_dialog("Verilog 代码格式化成功！")
+                cmd_process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                cmd_output = cmd_process.communicate()[1].replace(file_path+":","")
+                if(cmd_output==""):
+                    sublime.message_dialog("Verilog 代码格式化成功")
+                else:
+                    sublime.message_dialog("Verilog 代码格式化失败，存在语法错误：\n{}".format(cmd_output))
             except subprocess.CalledProcessError as e:
                 sublime.error_message("Verilog 代码格式化失败：{}".format(e))
         else:
-            sublime.error_message("无法获取当前文件路径！")
+            sublime.error_message("无法获取当前文件路径")
