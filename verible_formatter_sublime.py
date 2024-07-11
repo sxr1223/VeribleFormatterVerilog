@@ -1,20 +1,28 @@
 import sublime
 import sublime_plugin
 import subprocess
+import threading
+
 import sys
+import os #temp file removal
+import shlex #shell arg escaping
+import tempfile
+from functools import singledispatch
+
+SETTINGS_FILE = "verible_formatter_sublime.sublime-settings"
 
 class verible_formatter_sublime_command(sublime_plugin.TextCommand):
  
-    # def run(self, edit):
-    #     print(self.view.file_name())
-    #     self.view.insert(edit, 0, "Hello, World!")
-
     def run(self, edit):
+        threading.Thread(target=self.format_with_verible).start()
+
+
+    def format_with_verible(self):
         view = self.view
         # 获取当前文件路径
         file_path = view.file_name()
 
-        settings = sublime.load_settings("verible_formatter_sublime.sublime-settings")
+        settings = sublime.load_settings(SETTINGS_FILE)
         # print(sys.version)
         # print(dir(settings))
         if file_path:

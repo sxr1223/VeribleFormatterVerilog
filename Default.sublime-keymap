@@ -1,0 +1,6 @@
+[
+    {
+        "keys": ["f11"],
+        "command": "format_with_verible"
+    }
+]
