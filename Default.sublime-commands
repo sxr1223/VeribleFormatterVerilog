@@ -7,7 +7,7 @@
 		"caption": "Preferences: verible_formatter_verilog Settings",
 		"command": "edit_settings",
 		"args": {
-			"base_file": "${packages}/verible_formatter_sublime/verible_formatter_sublime.sublime-settings",
+			"base_file": "${packages}/VeribleFormatterVerilog/VeribleFormatterVerilog.sublime-settings",
 			"default": "//See the left pane for a list of settings and values\n{\n\t$0\n}\n"
 		}
 	},
@@ -15,7 +15,7 @@
 		"caption": "Preferences: Open verible_formatter_verilog Key Bindings",
 		"command": "edit_settings",
 		"args": {
-			"base_file": "${packages}/verible_formatter_sublime/Default.sublime-keymap",
+			"base_file": "${packages}/VeribleFormatterVerilog/Default.sublime-keymap",
 			"default": "[\n\t$0\n]\n"
 		}
 	}
