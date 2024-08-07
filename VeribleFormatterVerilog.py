@@ -69,14 +69,18 @@ class FormatWithVeribleCommand(sublime_plugin.TextCommand):
             print(command)
             try:
                 # 执行命令
-                cmd_process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                cmd_output = cmd_process.communicate()
+                cmd_process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+                encode = view.settings().get('force_encoding')
+                cmd_output = cmd_process.stdout.read().decode(encode).replace('\x0d','')
+                cmd_err_output = cmd_process.stderr.read().decode(encode)
+                # print('aaaaaaaaaaaaaaaaaaaaaaa')
                 # print(cmd_output)
-                if(cmd_output[1]==""):
-                    self.remove_comment(view, edit, cmd_output[0])
+                if(cmd_err_output==''):
+                    self.remove_comment(view, edit, cmd_output)
                     sublime.message_dialog("Verilog 代码格式化成功")
                 else:
-                    error_message = cmd_output[1].replace(file_path+":","")[1:]
+                    error_message = cmd_err_output.replace(file_path+":","")[1:]
                     sublime.message_dialog("Verilog 代码格式化失败，存在语法错误：\n{}".format(error_message))
             except subprocess.CalledProcessError as e:
                 sublime.error_message("Verilog 代码格式化失败：{}".format(e))
