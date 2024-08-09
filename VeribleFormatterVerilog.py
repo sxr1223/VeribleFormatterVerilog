@@ -9,19 +9,33 @@ import tempfile
 
 SETTINGS_FILE = "VeribleFormatterVerilog.sublime-settings"
 
+lang = {
+    "ZH":{
+        "success": "Verible 代码格式化成功",
+        "no_file_path": "无法获取当前文件路径",
+        "error": "Verilog 代码格式化失败：",
+        "syntax_error": "Verilog 代码格式化失败，存在语法错误：\n",
+        "more_error": "\n更多错误被隐藏..."
+    },
+    "EN":{
+        "success": "Verible format success",
+        "no_file_path": "can't get file path",
+        "error": "Verilog format failed：",
+        "syntax_error": "Verilog format failed, syntax error:\n",
+        "more_error": "\nAnd more error hidden..."
+    }
+}
+
 class FormatWithVeribleCommand(sublime_plugin.TextCommand):
- 
     def run(self, edit):
         view = self.view
-        # 获取当前文件路径
-        file_path = view.file_name()
-
-        self.add_comment(view, edit)
-
         settings = sublime.load_settings(SETTINGS_FILE)
+        local_lang = lang[settings["language"]]
 
+        file_path = view.file_name()
+        self.add_comment(view, edit)
+        
         if file_path:
-            # 调用 Verible 格式化 Verilog 代码
             flags_file_path = settings["flags_file_path"]
             if(flags_file_path!=""):
                 if(flags_file_path == "example"):
@@ -63,7 +77,8 @@ class FormatWithVeribleCommand(sublime_plugin.TextCommand):
                     encoding = view.settings().get('origin_encoding')
                 if not encoding:
                     encoding = "utf8"
-                # 执行命令                
+                
+                # excute command            
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
@@ -76,22 +91,22 @@ class FormatWithVeribleCommand(sublime_plugin.TextCommand):
                 if(cmd_err_output==''):
                     self.remove_comment(view, edit, cmd_output)
                     if(settings['show_message_dialog_when_successed']==True):
-                        sublime.message_dialog("Verilog 代码格式化成功")
+                        sublime.message_dialog(local_lang["success"])
                 else:
                     max_error_lines = settings['max_error_lines']
                     region_all = sublime.Region(0, view.size())
                     file_text = view.substr(region_all)
                     self.remove_comment(view, edit, file_text)
                     error_message = cmd_err_output.replace(file_path+":","").split("\n")
-                    error_message_disp = "\n".join(error_message[:max_error_lines])
+                    error_message_disp = "\n".join(error_message[:max_error_lines])[1:]
                     append_message = ""
                     if(len(error_message)>max_error_lines):
-                        append_message = "\nAnd more error hidden..."
-                    sublime.message_dialog("Verilog 代码格式化失败，存在语法错误：\n{}{}".format(error_message_disp,append_message))
+                        append_message = local_lang["more_error"]
+                    sublime.message_dialog(local_lang["syntax_error"]+error_message_disp+append_message)
             except subprocess.CalledProcessError as e:
-                sublime.error_message("Verilog 代码格式化失败：{}".format(e))
+                sublime.error_message(local_lang["error"]+str(e))
         else:
-            sublime.error_message("无法获取当前文件路径")
+            sublime.error_message(local_lang["no_file_path"])
 
     def add_comment(self, view, edit):
         region_all = sublime.Region(0, view.size())
@@ -114,7 +129,7 @@ class FormatWithVeribleCommand(sublime_plugin.TextCommand):
 
         processed_text = ""
         for i in lines:
-            if(i.find(r"`include")!=-1 and i.find("//")!=-1):
+            if(i.find(r"`include")!=-1 and i.find("")!=-1):
                 i=i.replace("//","")
             processed_text+=i+"\n"
         processed_text=processed_text[:-1]

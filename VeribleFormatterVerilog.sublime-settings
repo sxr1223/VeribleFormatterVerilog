@@ -6,6 +6,9 @@
     "show_message_dialog_when_successed": true,
     "max_error_lines": 10,
 
+    // language could be `EN` or `ZH`
+    "language": "EN",
+
     "column_limit": 100,
     "tab_size": 4,
     "line_break_penalty": 0,
