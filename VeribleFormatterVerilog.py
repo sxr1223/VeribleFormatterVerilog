@@ -33,13 +33,18 @@ class FormatWithVeribleCommand(sublime_plugin.TextCommand):
         local_lang = lang[settings["language"]]
 
         file_path = view.file_name()
-        self.add_comment(view, edit)
         
-        if file_path:
-            flags_file_path = settings["flags_file_path"]
+        if(file_path):
+            flags_file_path = settings["global_flags_file_path"]
+            project_path = view.window().extract_variables()['project_path']
+            if(project_path!=""):
+                project_flag = project_path+"\\"+settings["project_flags_file_name"]
+                if(os.path.exists(project_flag)==True):
+                    flags_file_path = project_flag
+
             if(flags_file_path!=""):
-                if(flags_file_path == "example"):
-                    flags_file_path = os.path.join(sublime.packages_path(), 'VeribleFormatterVerilog/flags.txt')
+                if(flags_file_path[0] == "."):
+                    flags_file_path = os.path.join(sublime.packages_path(), settings["global_flags_file_path"])
                 command = ["verible-verilog-format ", "--flagfile", flags_file_path]
             else:
                 command = ["verible-verilog-format"]
@@ -71,6 +76,8 @@ class FormatWithVeribleCommand(sublime_plugin.TextCommand):
                 command.append("--try_wrap_long_lines="+str(settings["try_wrap_long_lines"]).lower())     
                 command.append("--wrap_end_else_clauses="+str(settings["wrap_end_else_clauses"]).lower())
             command.append(file_path)
+
+            self.add_comment(view, edit)
             try:
                 encoding = view.settings().get('force_encoding')
                 if not encoding:

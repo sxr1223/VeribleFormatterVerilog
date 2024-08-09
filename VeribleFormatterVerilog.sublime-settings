@@ -1,8 +1,12 @@
 {
     // if you want to use flags file, please set this to your flags file. flags file takes precedence
     // or keep this be empty, then plugin use the setting specified below.
-    "flags_file_path":"./VeribleFormatterVerilog/flags.txt",
-    
+    // relative path must start with `.`, file is under sublime plugin path.
+    "global_flags_file_path":"./VeribleFormatterVerilog/verible_flags.txt",
+    // specify flag file name under project. if exit, verible will use the flag file under project, 
+    // not `flags_file_path` or setting specified below.
+    "project_flags_file_name":"verible_flags.txt",
+
     "show_message_dialog_when_successed": true,
     "max_error_lines": 10,
 

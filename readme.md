@@ -17,6 +17,8 @@ reg [32-1:0] test[0:1024-1] ={`include "res.dat"};
 
 Verible will show an error and refuse formatting. This plugin will auto comment out these code and uncomment them afer formatting.
 
+You can specify verible setting form flag file or plugin setting. Flag file under project `project_flags_file_name` take precedence, then global flag file `global_flags_file_path`, the last one is plugin setting.
+
 ## Installation
 
 Befor using this plugin, you have to install verible and add that to your `PATH`. Please make sure you can use `verible-verilog-format` directly in shell.
