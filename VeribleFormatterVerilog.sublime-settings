@@ -3,7 +3,7 @@
     // or keep this be empty, then plugin use the setting specified below.
     "flags_file_path":"./VeribleFormatterVerilog/flags.txt",
 
-    "column_limit ": 100,
+    "column_limit": 100,
     "tab_size": 4,
     "line_break_penalty": 0,
     "over_column_limit_penalty": 1,
