@@ -4,11 +4,8 @@ import subprocess
 import threading
 import time
 
-import sys
-import os #temp file removal
-import shlex #shell arg escaping
+import os
 import tempfile
-from functools import singledispatch
 
 SETTINGS_FILE = "VeribleFormatterVerilog.sublime-settings"
 
@@ -18,7 +15,6 @@ class FormatWithVeribleCommand(sublime_plugin.TextCommand):
         view = self.view
         # 获取当前文件路径
         file_path = view.file_name()
-        view.run_command("save")
 
         self.add_comment(view, edit)
 
@@ -65,27 +61,33 @@ class FormatWithVeribleCommand(sublime_plugin.TextCommand):
                 encoding = view.settings().get('force_encoding')
                 if not encoding:
                     encoding = view.settings().get('origin_encoding')
-
-                # 执行命令
-                # st=subprocess.STARTUPINFO()
-                # st.dwFlags=subprocess.STARTF_USESHOWWINDOW
-                
-                # startupinfo = subprocess.STARTUPINFO()
-                # startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                if not encoding:
+                    encoding = "utf8"
+                # 执行命令                
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
                 command_res = ' '.join(command)
-                print(command_res)
-                # cmd_process = subprocess.Popen(command, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                cmd_process = subprocess.run(command_res, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
+                # print(command_res)
+                cmd_process = subprocess.run(command_res, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                
                 cmd_output = cmd_process.stdout.decode(encoding).replace('\x0d','')
                 cmd_err_output = cmd_process.stderr.decode(encoding)
                 if(cmd_err_output==''):
                     self.remove_comment(view, edit, cmd_output)
-                    sublime.message_dialog("Verilog 代码格式化成功")
+                    if(settings['show_message_dialog_when_successed']==True):
+                        sublime.message_dialog("Verilog 代码格式化成功")
                 else:
-                    error_message = cmd_err_output.replace(file_path+":","")[1:]
-                    sublime.message_dialog("Verilog 代码格式化失败，存在语法错误：\n{}".format(error_message))
+                    max_error_lines = settings['max_error_lines']
+                    region_all = sublime.Region(0, view.size())
+                    file_text = view.substr(region_all)
+                    self.remove_comment(view, edit, file_text)
+                    error_message = cmd_err_output.replace(file_path+":","").split("\n")
+                    error_message_disp = "\n".join(error_message[:max_error_lines])
+                    append_message = ""
+                    if(len(error_message)>max_error_lines):
+                        append_message = "\nAnd more error hidden..."
+                    sublime.message_dialog("Verilog 代码格式化失败，存在语法错误：\n{}{}".format(error_message_disp,append_message))
             except subprocess.CalledProcessError as e:
                 sublime.error_message("Verilog 代码格式化失败：{}".format(e))
         else:
