@@ -36,7 +36,7 @@ class FormatWithVeribleCommand(sublime_plugin.TextCommand):
         
         if(file_path):
             flags_file_path = settings["global_flags_file_path"]
-            project_path = view.window().extract_variables()['project_path']
+            project_path = view.window().extract_variables().get("project_path","")
             if(project_path!=""):
                 project_flag = project_path+"\\"+settings["project_flags_file_name"]
                 if(os.path.exists(project_flag)==True):
