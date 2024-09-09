@@ -85,9 +85,14 @@ class FormatWithVeribleCommand(sublime_plugin.TextCommand):
                 if not encoding:
                     encoding = "utf8"
                 
-                # excute command            
-                startupinfo = subprocess.STARTUPINFO()
-                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                # excute command
+                if hasattr(subprocess, "STARTUPINFO"):
+                    # for windows
+                    startupinfo = subprocess.STARTUPINFO()
+                    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                else:
+                    # for linux
+                    startupinfo = None
 
                 command_res = ' '.join(command)
                 # print(command_res)
